@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  " Android Activity 生命周期"
+title:  " Android Activity 以及 Application 生命周期"
 date:   2017-08-08 20:00:00 +0800
 categories: Android 
 tags: Android 
@@ -84,16 +84,73 @@ B Activity从站顶弹出并销毁，此时 Activity 堆栈只有 A Activity。
 
 Tips：`onBackPressed` 默认实现是调用 `finish()`
 
+## Application
 
+`Application`:
 
+> Base class for those who need to maintain global application state. You can
+> provide your own implementation by specifying its name in your
+> AndroidManifest.xml's &lt;application&gt; tag, which will cause that class
+> to be instantiated for you when the process for your application/package is created.
 
+一个为保存全局变量设计的基本类。
 
+```java
 
+public class App extends Application {
 
+    @Override
+    public void onCreate() {
+        // 程序创建的时候执行
+        super.onCreate();
+    }
+    @Override
+    public void onTerminate() {
+        // 程序终止的时候执行
+        super.onTerminate();
+    }
+    @Override
+    public void onLowMemory() {
+        // 低内存的时候执行
+        super.onLowMemory();
+    }
+    @Override
+    public void onTrimMemory(int level) {
+        // 程序在内存清理的时候执行
+        super.onTrimMemory(level);
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        // 程序配置信息改变的时候执行
+        super.onConfigurationChanged(newConfig);
+    }
+    
+}
 
+```
 
+`onCreate：`程序创建的时候初始化
 
+`onTerminate：`这个方法在程序结束的时候会调用。但是这个方法只用于`Android仿真机`测试的时候，在Android产品机是不会调用的。所以这个方法并没什么用。
 
+> This method is for use in emulated process environments.
+
+`onLowMemory：`监听Android系统整体内存比较低的时候，来释放一些不重要的资源，清理一下垃圾。
+
+`onTrimMemory(int level):` `level`相当于一个权重，可以根据权重的值来做出相应的操作。`int`值越小越重要，`int`包括 `5,10,15,20,40,60,80` 
+
+> Called when the operating system has determined that it is a good time for a process to trim unneeded memory from its process.
+
+`onConfigurationChanged：`监听一些配置信息发生改变的事件（屏幕旋转），当配置信息发生改变的时候会调用这个方法
+
+Tips:`activity`的`configChanges`,手机横竖屏切换的时候如果`activity`没有配置，`activity`会重启，而且不止一次。为了防止这种情况就需要用到`configChanges`。
+
+```xml
+
+// 横竖屏切换时就不会重新创建activity，还有很多其他配置参数`mmc`,`mnc`
+android:configChanges="orientation"
+
+```
 
 
 
